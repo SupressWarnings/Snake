@@ -4,9 +4,9 @@ import java.util.ArrayList;
 import java.util.Random;
 
 import com.constantin.snake.util.Location;
+import com.constantin.snake.util.Constants;
 
 import javafx.animation.AnimationTimer;
-import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -22,41 +22,26 @@ import javafx.stage.Stage;
  * @author Constantin Schulte
  * @version 1.0
  */
-public class Main extends Application{
+public class Main {
 	
-	public static final int FIELD_WIDTH = 25;
-	public static final int FIELD_HEIGHT = 20;
-	public static final String VERSION = "v1.1.0";
+	private static int score = 0;
 	
-	private int score = 0;
 	
-	private static Main appl;
-	
-	private AnimationTimer mainThread;
-	private Scene playing;
-	private Button[][] buttons;
-	private GridPane field, window, buttonPane;
-	public Stage primaryStage;
-	private Snake snake;
-	private Apple apple;
-	private Label scoreLabel;
-	private Button menu;
-	private Button pause;
-	private Button restartButton;
-	private Random r;
+	private static AnimationTimer mainThread;
+	private static Scene playing;
+	private static Button[][] buttons;
+	private static GridPane field, window, buttonPane;
+	private static Stage primaryStage, chooseLevel;
+	private static Snake snake;
+	private static Apple apple;
+	private static Label scoreLabel;
+	private static Button menu, pause,  restartButton;
+	private static Random r;
 	private static ArrayList<String> input = new ArrayList<>();
-	private boolean stopped = false;
-	
-	/**
-	 * Main method. Just starting window.
-	 * 
-	 * @author Constantin Schulte
-	 * @version 1.0
-	 * @param args
-	 */
-	public static void main(String[] args){
-		launch(args);
-	}
+	private static String[][] level;
+	private static Location snakeStartLocation
+					= new Location((int)Constants.FIELD_WIDTH/2, (int)Constants.FIELD_HEIGHT/2);
+	private static boolean stopped, lost = false;
 	
 	/**
 	 * Initializing instances.
@@ -65,47 +50,99 @@ public class Main extends Application{
 	 * @author Constantin
 	 * @version 0.0
 	 */
-	@Override
-	public void start(Stage primaryStage) throws Exception {
-		this.primaryStage = primaryStage;
-		r = new Random();
-		buttons = new Button[FIELD_WIDTH][FIELD_HEIGHT];
-		field = new GridPane();
-		window = new GridPane();
-		buttonPane = new GridPane();
-		menu = new Button("Menu");
-		pause = new Button("||");
-		restartButton = new Button("Neu starten");
-		snake = new Snake(new Location((int)FIELD_WIDTH/2, (int)FIELD_HEIGHT/2));
-		apple = new Apple(new Location(r.nextInt(FIELD_WIDTH), r.nextInt(FIELD_HEIGHT)));
-		scoreLabel = new Label("Score: " + score);
+	public static void start(Stage stage) throws Exception {
+		primaryStage = stage;
 		
-		appl = this;
-		
-		initField();
-		
-		play();
+		chooseLevel();
 	}
 	
 	public static void restart(){
-		appl.score = 0;
-		appl.primaryStage.setScene(appl.playing);
-		appl.mainThread.start();
-		appl.stopped = false;
+		score = 0;
+		primaryStage.setScene(playing);
+		mainThread.start();
+		stopped = false;
 	}
 	
-	private void restartGame(){
+	private static void restartGame(){
 		score = 0;
-		for(Button[] row : buttons){
-			for(Button button : row){
-				button.setId("button");
+		for(int x = 0; x < Constants.FIELD_WIDTH; ++x){
+			for(int y = 0; y < Constants.FIELD_HEIGHT; ++y){
+				buttons[x][y].setId("button");
+				if(level != null){
+					if(level[x][y].equals("block")){
+						buttons[x][y].setId("block");
+					}
+				}
 			}
 		}
+		lost = false;
 		scoreLabel.setText("Score: "+score);
-		snake = new Snake(new Location((int)FIELD_WIDTH/2, (int)FIELD_HEIGHT/2));
-		apple = new Apple(new Location(r.nextInt(FIELD_WIDTH), r.nextInt(FIELD_HEIGHT)));
+		snake = new Snake(new Location(snakeStartLocation));
+		apple = new Apple(newAppleLocation());
 		stopped = false;
 		mainThread.start();
+	}
+	
+	static void chooseLevel(){
+		chooseLevel = new Stage();
+		chooseLevel.setTitle("Levelauswahl");
+		
+		GridPane allLevels = new GridPane();
+		allLevels.setPadding(new Insets(64));
+		allLevels.setHgap(32);
+		allLevels.setVgap(32);
+		
+		Button empty = new Button("Empty");
+		empty.setPrefSize(128, 32);
+		allLevels.add(empty, 2, 0);
+		empty.setOnAction(new EventHandler<ActionEvent>(){
+
+			@Override
+			public void handle(ActionEvent arg0) {
+				level = Constants.EMPTY;
+				startPlaying();
+			}
+			
+		});
+		
+		Button box = new Button("Box");
+		box.setPrefSize(128, 32);
+		allLevels.add(box, 2, 1);
+		box.setOnAction(new EventHandler<ActionEvent>(){
+
+			@Override
+			public void handle(ActionEvent arg0) {
+				level = Constants.BOX;	
+				startPlaying();
+			}
+			
+		});
+		
+		Button fields = new Button("Fields");
+		fields.setPrefSize(128, 32);
+		allLevels.add(fields, 2, 2);
+		fields.setOnAction(new EventHandler<ActionEvent>(){
+
+			@Override
+			public void handle(ActionEvent arg0) {
+				level = Constants.FIELDS;
+				snakeStartLocation = new Location((int)Constants.FIELD_WIDTH/4*3,
+						(int)Constants.FIELD_HEIGHT/4*3);
+				startPlaying();
+			}
+			
+		});
+		
+		Scene levels = new Scene(allLevels, 500, 250);
+		
+		chooseLevel.setScene(levels);
+		chooseLevel.setAlwaysOnTop(true);
+		chooseLevel.show();
+	}
+	
+	private static void startPlaying(){
+		chooseLevel.close();
+		initField();
 	}
 	
 	/**
@@ -114,19 +151,36 @@ public class Main extends Application{
 	 * @author Constantin Schulte
 	 * @version 1.0
 	 */
-	private void initField(){
+	private static void initField(){
+		r = new Random();
+		buttons = new Button[Constants.FIELD_WIDTH][Constants.FIELD_HEIGHT];
+		field = new GridPane();
+		window = new GridPane();
+		buttonPane = new GridPane();
+		menu = new Button("Menu");
+		pause = new Button("||");
+		restartButton = new Button("Neu starten");
+		scoreLabel = new Label("Score: " + score);
+		scoreLabel.setPrefWidth(128);
 		
 		field.setHgap(5);
 		field.setVgap(5);
 		
-		for(int x = 0; x < FIELD_WIDTH; ++x){
-			for(int y = 0; y < FIELD_HEIGHT; ++y){
+		for(int x = 0; x < Constants.FIELD_WIDTH; ++x){
+			for(int y = 0; y < Constants.FIELD_HEIGHT; ++y){
 				buttons[x][y] = new Button();
 				buttons[x][y].setId("button");
 				buttons[x][y].setPrefSize(32, 32);
 				field.add(buttons[x][y], x, y);
+				if(level != null){
+					if(level[x][y].equals("block")){
+						buttons[x][y].setId("block");
+					}
+				}
 			}
 		}
+		snake = new Snake(new Location(snakeStartLocation));
+		apple = new Apple(newAppleLocation());
 		
 		menu.setOnAction(new EventHandler<ActionEvent>(){
 
@@ -143,14 +197,16 @@ public class Main extends Application{
 
 			@Override
 			public void handle(ActionEvent arg0) {
-				if(stopped){
+				if(stopped && !lost){
 					mainThread.start();
 					stopped = false;
 					pause.setText("||");
-				}else{
+				}else if(!stopped){
 					mainThread.stop();
 					stopped = true;
 					pause.setText(">");
+				}else{
+					restartGame();
 				}
 			}
 			
@@ -192,6 +248,8 @@ public class Main extends Application{
 		
 		primaryStage.setScene(playing);
 		primaryStage.show();
+		
+		play();
 	}
 	
 	/**
@@ -200,7 +258,7 @@ public class Main extends Application{
 	 * @author Constantin Schulte
 	 * @version 1.0
 	 */
-	private void play() {
+	private static void play() {
 		mainThread = new AnimationTimer(){
 
             @Override
@@ -226,11 +284,11 @@ public class Main extends Application{
 	 * @author Constantin Schulte
 	 * @version 1.0
 	 */
-	private void draw(){
+	private static void draw(){
 		int[][] snakeLoc = snake.getSnake();
 		
-		for(int x = 0; x < FIELD_WIDTH; ++x){
-			for(int y = 0; y < FIELD_HEIGHT; ++y){
+		for(int x = 0; x < Constants.FIELD_WIDTH; ++x){
+			for(int y = 0; y < Constants.FIELD_HEIGHT; ++y){
 				if(buttons[x][y].getId().equals("snake")){
 					buttons[x][y].setId("button");
 				}
@@ -251,7 +309,7 @@ public class Main extends Application{
 	 * @author Constantin Schulte
 	 * @version 1.0
 	 */
-	private void inputHandler(){
+	private static void inputHandler(){
 		if(input.contains("DOWN")){
 			if(snake.getDirection().equals("d") || snake.getDirection().equals("u")){
 				input.remove("DOWN");
@@ -290,20 +348,17 @@ public class Main extends Application{
 	 * @author Constantin Schulte
 	 * @version 1.0
 	 */
-	private void checkCollisions(){
+	private static void checkCollisions(){
 		if(apple.getLoc().equals(new Location(snake.getSnake()[0][0], snake.getSnake()[0][1]))){
 			snake.incrementSnake();
 			score += 10;
 			scoreLabel.setText("Score: " + score);
-			Location newAppleLocation = new Location(0, 0);
-			do{
-				newAppleLocation = new Location(r.nextInt(FIELD_WIDTH), r.nextInt(FIELD_HEIGHT));
-			}while(isSnake(newAppleLocation));
-			apple.setLocation(newAppleLocation);
+			apple.setLocation(newAppleLocation());
 		}
 		Location[] snakeLoc = snake.getSnakeLocs();
 		for(int i = 1; i < snakeLoc.length; ++i){
-			if(snakeLoc[i].equals(snakeLoc[0])){
+			if(snakeLoc[i].equals(snakeLoc[0])
+					|| buttons[snakeLoc[0].getX()][snakeLoc[0].getY()].getId().equals("block")){
 				loose();
 			}
 		}
@@ -316,8 +371,9 @@ public class Main extends Application{
 	 * @author Constantin Schulte
 	 * @version 1.0
 	 */
-	private void loose(){
+	private static void loose(){
 		mainThread.stop();
+		lost = true;
 		stopped = true;
 	}
 	
@@ -330,7 +386,7 @@ public class Main extends Application{
 	 * @param location - a location to be checked
 	 * @return true if snake is at this position
 	 */
-	private boolean isSnake(Location location){
+	private static boolean isSnake(Location location){
 		int[][] snakeLoc = snake.getSnake();
 		for(int[] loc : snakeLoc){
 			Location snakeLocation = new Location(loc[0], loc[1]);
@@ -339,5 +395,15 @@ public class Main extends Application{
 			}
 		}
 		return false;
+	}
+	
+	private static Location newAppleLocation(){
+		Location newAppleLocation = new Location(0, 0);
+		do{
+			newAppleLocation = new Location(r.nextInt(Constants.FIELD_WIDTH),
+					r.nextInt(Constants.FIELD_HEIGHT));
+		}while(isSnake(newAppleLocation)
+				|| buttons[newAppleLocation.getX()][newAppleLocation.getY()].getId().equals("block"));
+		return newAppleLocation;
 	}
 }

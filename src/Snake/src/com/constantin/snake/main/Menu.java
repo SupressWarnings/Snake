@@ -1,5 +1,8 @@
 package com.constantin.snake.main;
 
+
+import com.constantin.snake.util.Constants;
+
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
@@ -13,19 +16,18 @@ public class Menu {
 	private static Stage primaryStage;
 	private static GridPane menuPane;
 	private static Scene menuScene;
-	private static Label version;
-	private static Label author;
-	private static Label gd;
-	private static Button back;
+	private static Label version, author, gd;
+	private static Button back, chooseLevel;
 	
 	public static void menu(Stage Stage){
 		primaryStage = Stage;
 		
 		menuPane = new GridPane();
-		version = new Label("Version: " + Main.VERSION);
+		version = new Label("Version: " + Constants.VERSION);
 		author = new Label("Programmierer: Constantin Schulte");
 		gd = new Label("Graphical Designer: Constantin Schulte");
 		back = new Button("Back");
+		chooseLevel = new Button("Levelauswahl");
 		
 		initField();
 	}
@@ -42,7 +44,18 @@ public class Menu {
 			
 		});
 		
+		chooseLevel.setOnAction(new EventHandler<ActionEvent>(){
+
+			@Override
+			public void handle(ActionEvent arg0) {
+				Main.chooseLevel();
+				primaryStage.hide();
+			}
+			
+		});
+		
 		menuPane.add(back, 2, 5);
+		menuPane.add(chooseLevel, 1, 5);
 		menuPane.add(version, 1, 1);
 		menuPane.add(author, 1, 2);
 		menuPane.add(gd, 2, 2);
@@ -52,4 +65,6 @@ public class Menu {
 		primaryStage.setScene(menuScene);
 		primaryStage.show();
 	}
+	
+	
 }

@@ -2,6 +2,7 @@ package com.constantin.snake.main;
 
 import java.util.ArrayList;
 
+import com.constantin.snake.util.Constants;
 import com.constantin.snake.util.Location;
 
 /**
@@ -71,7 +72,7 @@ public class Snake {
 		case "u":
 			if(box.get(0).getY() == 0){
 				int x = box.get(0).getX();
-				box.get(0).setLocation(new Location(x, Main.FIELD_HEIGHT-1));
+				box.get(0).setLocation(new Location(x, Constants.FIELD_HEIGHT-1));
 			}else{
 				int newX = box.get(0).getX();
 				int newY = box.get(0).getY()-1;
@@ -80,7 +81,7 @@ public class Snake {
 			}
 			break;
 		case "r":
-			if(box.get(0).getX() == Main.FIELD_WIDTH-1){
+			if(box.get(0).getX() == Constants.FIELD_WIDTH-1){
 				int y = box.get(0).getY();
 				box.get(0).setLocation(new Location(0, y));
 			}else{
@@ -91,7 +92,7 @@ public class Snake {
 			}
 			break;
 		case "d":
-			if(box.get(0).getY() == Main.FIELD_HEIGHT-1){
+			if(box.get(0).getY() == Constants.FIELD_HEIGHT-1){
 				int x = box.get(0).getX();
 				box.get(0).setLocation(new Location(x, 0));
 			}else{
@@ -104,7 +105,7 @@ public class Snake {
 		case "l":
 			if(box.get(0).getX() == 0){
 				int y = box.get(0).getY();
-				box.get(0).setLocation(new Location(Main.FIELD_WIDTH-1, y));
+				box.get(0).setLocation(new Location(Constants.FIELD_WIDTH-1, y));
 			}else{
 				int newX = box.get(0).getX()-1;
 				int newY = box.get(0).getY();
