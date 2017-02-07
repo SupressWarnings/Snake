@@ -14,7 +14,7 @@ import com.constantin.snake.util.Location;
 public class Snake {
 	private ArrayList<Location> box;
 	private Location headLoc;
-	private char direction;
+	private String direction;
 	
 	/**
 	 * Creates a new snake with the location of the head as location transmitted.
@@ -26,7 +26,7 @@ public class Snake {
 	 */
 	public Snake(Location headLoc){
 		this.headLoc = headLoc;
-		direction = 'r';
+		direction = "r";
 		box = new ArrayList<Location>();
 		box.add(headLoc);
 		initSnake();
@@ -69,7 +69,7 @@ public class Snake {
 			box.get(index).setLocation(box.get(index-1));
 		}
 		switch(direction){
-		case 'u':
+		case "u":
 			if(box.get(0).getY() == 0){
 				int x = box.get(0).getX();
 				box.get(0).setLocation(new Location(x, Constants.FIELD_HEIGHT-1));
@@ -80,7 +80,7 @@ public class Snake {
 				box.get(0).setLocation(new Location(newX, newY));
 			}
 			break;
-		case 'r':
+		case "r":
 			if(box.get(0).getX() == Constants.FIELD_WIDTH-1){
 				int y = box.get(0).getY();
 				box.get(0).setLocation(new Location(0, y));
@@ -91,7 +91,7 @@ public class Snake {
 				box.get(0).setLocation(new Location(newX, newY));
 			}
 			break;
-		case 'd':
+		case "d":
 			if(box.get(0).getY() == Constants.FIELD_HEIGHT-1){
 				int x = box.get(0).getX();
 				box.get(0).setLocation(new Location(x, 0));
@@ -102,7 +102,7 @@ public class Snake {
 				box.get(0).setLocation(new Location(newX, newY));
 			}
 			break;
-		case 'l':
+		case "l":
 			if(box.get(0).getX() == 0){
 				int y = box.get(0).getY();
 				box.get(0).setLocation(new Location(Constants.FIELD_WIDTH-1, y));
@@ -169,7 +169,7 @@ public class Snake {
 	 * @version 1.0
 	 * @return String direction
 	 */
-	public char getDirection(){
+	public String getDirection(){
 		return direction;
 	}
 	
@@ -180,7 +180,7 @@ public class Snake {
 	 * @version 1.0
 	 * @param direction as new direction of snake
 	 */
-	public void setDirection(char direction){
+	public void setDirection(String direction){
 		this.direction = direction;
 	}
 }

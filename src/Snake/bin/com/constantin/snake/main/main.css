@@ -1,0 +1,12 @@
+#button {
+	-fx-background-color: #AAAAAA
+}
+#snake {
+	-fx-background-color: #22FF22
+}
+#apple {
+	-fx-background-color: #FF1111
+}
+#block {
+	-fx-background-color: #000000
+}
