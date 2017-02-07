@@ -2,9 +2,30 @@ package com.constantin.snake.util;
 
 public class Constants {
 	
-	public static final int FIELD_WIDTH = 25;
-	public static final int FIELD_HEIGHT = 20;
-	public static final String VERSION = "v1.2.0";
+	/**
+	 * The width of a single box in pixel.
+	 */
+	public static final int BOX_LENGTH = 25;
+	
+	/**
+	 * The factor you have to use when figuring the x- and y-Coordinate of a single box out.
+	 */
+	public static final int BOX_LOCATION_FACTOR = (int) (BOX_LENGTH*1.2);
+	
+	/**
+	 * The width of the playing field in boxes.
+	 */
+	public static final int FIELD_WIDTH = 30;
+	
+	/**
+	 * The height of the playing field in boxes.
+	 */
+	public static final int FIELD_HEIGHT = 25;
+	
+	/**
+	 * The version of the game right now.
+	 */
+	public static final String VERSION = "v1.3.0";
 
 	public static final String[][] BOX = createBoxLevel();
 	public static final String[][] FIELDS = createFieldLevel();
